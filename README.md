@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # AIS Skip-sporing i sanntid
 
 Vis skip i sanntid på et kart med data fra BarentsWatch sitt AIS API.
@@ -79,3 +80,7 @@ MIT
 ## Bidra
 
 Pull requests er velkomne! For større endringer, vennligst åpne et issue først for å diskutere hva du vil endre.
+=======
+# ais
+Hente ut AIS-data til en nettside
+>>>>>>> bce5e4ce1a62938400b654f495361fc8c8bac095
