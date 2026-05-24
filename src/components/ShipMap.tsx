@@ -1,0 +1,104 @@
+/**
+ * Kartkomponent for å vise skip med AIS-data
+ */
+
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import { Icon, LatLngBounds } from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import type { AISPosition } from '../types/ais';
+import { generateShipInfo, getShipColor } from '../utils/shipUtils';
+import { useEffect } from 'react';
+
+interface ShipMapProps {
+  ships: AISPosition[];
+  center?: [number, number];
+  zoom?: number;
+  autoFit?: boolean;
+}
+
+/**
+ * Komponent for å tilpasse kartvisning basert på skip
+ */
+function MapController({ ships, autoFit }: { ships: AISPosition[]; autoFit: boolean }) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (!autoFit || ships.length === 0) return;
+
+    // Beregn bounds for alle skip
+    const bounds = new LatLngBounds(
+      ships.map((ship) => [ship.latitude, ship.longitude])
+    );
+
+    // Tilpass kartet til å vise alle skip
+    map.fitBounds(bounds, { padding: [50, 50] });
+  }, [ships, autoFit, map]);
+
+  return null;
+}
+
+/**
+ * Opprett en tilpasset ikon for skip basert på type
+ */
+function createShipIcon(ship: AISPosition): Icon {
+  const color = getShipColor(ship.shipType);
+  
+  // Opprett SVG-ikon som en data URL
+  const svgIcon = `
+    <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="12" cy="12" r="8" fill="${color}" stroke="white" stroke-width="2"/>
+      <path d="M 12 8 L 12 16 M 8 12 L 16 12" stroke="white" stroke-width="2"/>
+    </svg>
+  `;
+
+  return new Icon({
+    iconUrl: `data:image/svg+xml;base64,${btoa(svgIcon)}`,
+    iconSize: [24, 24],
+    iconAnchor: [12, 12],
+    popupAnchor: [0, -12],
+  });
+}
+
+/**
+ * Hovedkomponent for kartvisning av skip
+ */
+export function ShipMap({
+  ships,
+  center = [69.6489, 18.9551], // Tromsø som standard
+  zoom = 6,
+  autoFit = true,
+}: ShipMapProps) {
+  return (
+    <MapContainer
+      center={center}
+      zoom={zoom}
+      style={{ height: '100%', width: '100%' }}
+      scrollWheelZoom={true}
+    >
+      <TileLayer
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+      />
+
+      {autoFit && <MapController ships={ships} autoFit={autoFit} />}
+
+      {ships.map((ship) => (
+        <Marker
+          key={ship.mmsi}
+          position={[ship.latitude, ship.longitude]}
+          icon={createShipIcon(ship)}
+        >
+          <Popup>
+            <div
+              style={{
+                minWidth: '250px',
+                maxWidth: '400px',
+              }}
+              dangerouslySetInnerHTML={{ __html: generateShipInfo(ship) }}
+            />
+          </Popup>
+        </Marker>
+      ))}
+    </MapContainer>
+  );
+}
