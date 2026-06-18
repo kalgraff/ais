@@ -6,7 +6,9 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import { Icon, LatLngBounds } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import type { AISPosition } from '../types/ais';
+import type { MarineDataPoint, MarineOverlayOptions } from '../types/marine';
 import { generateShipInfo, getShipColor } from '../utils/shipUtils';
+import { MarineDataLayer } from './MarineDataLayer';
 import { useEffect } from 'react';
 
 interface ShipMapProps {
@@ -14,6 +16,8 @@ interface ShipMapProps {
   center?: [number, number];
   zoom?: number;
   autoFit?: boolean;
+  marineData?: MarineDataPoint[];
+  marineOptions?: MarineOverlayOptions;
 }
 
 /**
@@ -41,7 +45,7 @@ function MapController({ ships, autoFit }: { ships: AISPosition[]; autoFit: bool
  * Opprett en tilpasset ikon for skip basert på type
  */
 function createShipIcon(ship: AISPosition): Icon {
-  const color = getShipColor(ship.shipType);
+  const color = getShipColor(ship.shipType, ship.name);
   
   // Opprett SVG-ikon som en data URL
   const svgIcon = `
@@ -67,6 +71,8 @@ export function ShipMap({
   center = [69.6489, 18.9551], // Tromsø som standard
   zoom = 6,
   autoFit = true,
+  marineData = [],
+  marineOptions = { showTemperature: false, showWaves: false, showCurrents: false },
 }: ShipMapProps) {
   return (
     <MapContainer
@@ -82,6 +88,17 @@ export function ShipMap({
 
       {autoFit && <MapController ships={ships} autoFit={autoFit} />}
 
+      {/* Marine data overlay */}
+      {marineData.length > 0 && (
+        <MarineDataLayer
+          data={marineData}
+          showTemperature={marineOptions.showTemperature}
+          showWaves={marineOptions.showWaves}
+          showCurrents={marineOptions.showCurrents}
+        />
+      )}
+
+      {/* Skip markers */}
       {ships.map((ship) => (
         <Marker
           key={ship.mmsi}

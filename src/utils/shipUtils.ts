@@ -8,7 +8,15 @@ import { ShipType } from '../types/ais';
 /**
  * Konverter skipstypekode til lesbar tekst
  */
-export function getShipTypeText(shipType?: number): string {
+export function getShipTypeText(shipType?: number, name?: string): string {
+  // Sjekk om det er en bøye basert på navn
+  if (name) {
+    const upperName = name.toUpperCase();
+    if (upperName.includes('BUOY') || upperName.includes('BØYE')) {
+      return 'Bøye';
+    }
+  }
+
   if (shipType === undefined) return 'Ukjent';
 
   switch (shipType) {
@@ -111,9 +119,17 @@ export function formatTimestamp(timestamp: string): string {
 }
 
 /**
- * Beregn farge basert på skipstype
+ * Beregn farge basert på skipstype og navn
  */
-export function getShipColor(shipType?: number): string {
+export function getShipColor(shipType?: number, name?: string): string {
+  // Sjekk om det er en bøye basert på navn
+  if (name) {
+    const upperName = name.toUpperCase();
+    if (upperName.includes('BUOY') || upperName.includes('BØYE')) {
+      return '#FF6F00'; // Oransje for bøyer
+    }
+  }
+
   if (shipType === undefined) return '#808080';
 
   switch (shipType) {
@@ -157,8 +173,8 @@ export function generateShipInfo(ship: AISPosition): string {
 
   parts.push(`<strong>MMSI:</strong> ${ship.mmsi}`);
 
-  if (ship.shipType !== undefined) {
-    parts.push(`<strong>Type:</strong> ${getShipTypeText(ship.shipType)}`);
+  if (ship.shipType !== undefined || ship.name) {
+    parts.push(`<strong>Type:</strong> ${getShipTypeText(ship.shipType, ship.name)}`);
   }
 
   if (ship.callSign) {

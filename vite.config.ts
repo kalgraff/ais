@@ -4,4 +4,20 @@ import react from '@vitejs/plugin-react'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  server: {
+    proxy: {
+      '/auth': {
+        target: 'https://id.barentswatch.no',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/auth/, ''),
+        secure: true,
+      },
+      '/api': {
+        target: 'https://live.ais.barentswatch.no',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+        secure: true,
+      },
+    },
+  },
 })

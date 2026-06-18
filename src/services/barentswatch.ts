@@ -9,9 +9,13 @@ import type {
   AISApiResponse,
 } from '../types/ais';
 
-const API_URL =
-  import.meta.env.VITE_BARENTSWATCH_API_URL ||
-  'https://www.barentswatch.no/bwapi';
+// Bruk proxy i development, direkte URL i production
+const AUTH_URL = import.meta.env.DEV 
+  ? '/auth/connect/token' 
+  : 'https://id.barentswatch.no/connect/token';
+const AIS_API_URL = import.meta.env.DEV 
+  ? '/api/v1' 
+  : 'https://live.ais.barentswatch.no/v1';
 const CLIENT_ID = import.meta.env.VITE_BARENTSWATCH_CLIENT_ID;
 const CLIENT_SECRET = import.meta.env.VITE_BARENTSWATCH_CLIENT_SECRET;
 
@@ -35,7 +39,7 @@ class BarentsWatchAPI {
     }
 
     try {
-      const response = await fetch(`${API_URL}/token`, {
+      const response = await fetch(AUTH_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -104,7 +108,7 @@ class BarentsWatchAPI {
       }
 
       const queryString = params.toString();
-      const url = `${API_URL}/v1/ais/openpositions${queryString ? `?${queryString}` : ''}`;
+      const url = `${AIS_API_URL}/latest/combined${queryString ? `?${queryString}` : ''}`;
 
       const response = await fetch(url, {
         method: 'GET',
@@ -124,8 +128,9 @@ class BarentsWatchAPI {
         throw new Error(`API-kall feilet: ${response.status} ${response.statusText}`);
       }
 
-      const data: AISApiResponse = await response.json();
-      return data.items || [];
+      const data = await response.json();
+      // API returnerer en array direkte, ikke et objekt med items
+      return Array.isArray(data) ? data : [];
     } catch (error) {
       console.error('Feil ved henting av AIS-data:', error);
       throw error;
