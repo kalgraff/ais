@@ -2,13 +2,14 @@
 
 .marine-overlay-control {
   position: absolute;
-  top: 1rem;
-  left: 1rem;
+  top: auto;
+  bottom: 1rem;
+  right: 1rem;
   z-index: 1000;
   background: white;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  max-width: 350px;
+  max-width: 320px;
   width: calc(100% - 2rem);
 }
 
@@ -225,7 +226,8 @@
   .marine-overlay-control {
     position: relative;
     top: auto;
-    left: auto;
+    bottom: auto;
+    right: auto;
     margin: 1rem;
     max-width: 100%;
   }
@@ -234,5 +236,10 @@
 @media (max-width: 768px) {
   .marine-content {
     max-height: 40vh;
+  }
+  
+  .marine-overlay-control {
+    max-width: 100%;
+    width: auto;
   }
 }
