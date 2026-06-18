@@ -53,11 +53,34 @@ function App() {
       return allShips; // Vis alle hvis ingen er valgt
     }
     return allShips.filter((ship) => {
-      // Sjekk for bøyer (type -1 betyr navn-basert filtrering)
+      const upperName = ship.name?.toUpperCase() || '';
+      
+      // Sjekk for bøyer (type -1 betyr navn-basert filtrering, inkludert feilstavinger)
       if (selectedTypes.has(-1)) {
-        const isBuoy = ship.name?.toUpperCase().includes('BUOY') || 
-                       ship.name?.toUpperCase().includes('BØYE');
+        const isBuoy = upperName.includes('BUOY') || 
+                       upperName.includes('BOUY') || 
+                       upperName.includes('BØYE');
         if (isBuoy) return true;
+      }
+      
+      // Sjekk for plattformer/rigger (type -2)
+      if (selectedTypes.has(-2)) {
+        const isPlatform = upperName.includes('PLATFORM') ||
+                          upperName.includes('DEEPSEA') ||
+                          upperName.includes('OCEAN RIG') ||
+                          upperName.includes('NORNE');
+        if (isPlatform) return true;
+      }
+      
+      // Sjekk for akvakultur (type -3)
+      if (selectedTypes.has(-3)) {
+        const isAquaculture = upperName.includes('SOJ') ||
+                             upperName.includes('SOY') ||
+                             upperName.includes('FISHIES') ||
+                             upperName.includes('FISH FARM') ||
+                             upperName.includes('MERD') ||
+                             upperName.includes('AKVA');
+        if (isAquaculture) return true;
       }
       
       // Vanlig shipType filtrering
@@ -69,15 +92,40 @@ function App() {
   const shipCounts = useMemo(() => {
     const counts = new Map<number, number>();
     
-    // Tell bøyer (spesiell type -1)
+    // Tell spesielle navn-baserte kategorier
     let buoyCount = 0;
+    let platformCount = 0;
+    let aquacultureCount = 0;
     
     allShips.forEach((ship) => {
-      // Tell bøyer
-      const isBuoy = ship.name?.toUpperCase().includes('BUOY') || 
-                     ship.name?.toUpperCase().includes('BØYE');
+      const upperName = ship.name?.toUpperCase() || '';
+      
+      // Tell bøyer (inkludert feilstavinger)
+      const isBuoy = upperName.includes('BUOY') || 
+                     upperName.includes('BOUY') || 
+                     upperName.includes('BØYE');
       if (isBuoy) {
         buoyCount++;
+      }
+      
+      // Tell plattformer/rigger
+      const isPlatform = upperName.includes('PLATFORM') ||
+                        upperName.includes('DEEPSEA') ||
+                        upperName.includes('OCEAN RIG') ||
+                        upperName.includes('NORNE');
+      if (isPlatform) {
+        platformCount++;
+      }
+      
+      // Tell akvakultur
+      const isAquaculture = upperName.includes('SOJ') ||
+                           upperName.includes('SOY') ||
+                           upperName.includes('FISHIES') ||
+                           upperName.includes('FISH FARM') ||
+                           upperName.includes('MERD') ||
+                           upperName.includes('AKVA');
+      if (isAquaculture) {
+        aquacultureCount++;
       }
       
       // Tell vanlige skip-typer
@@ -86,8 +134,10 @@ function App() {
       }
     });
     
-    // Legg til bøyer-telling
+    // Legg til spesielle kategorier
     counts.set(-1, buoyCount);
+    counts.set(-2, platformCount);
+    counts.set(-3, aquacultureCount);
     
     return counts;
   }, [allShips]);

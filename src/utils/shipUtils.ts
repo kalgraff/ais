@@ -9,11 +9,31 @@ import { ShipType } from '../types/ais';
  * Konverter skipstypekode til lesbar tekst
  */
 export function getShipTypeText(shipType?: number, name?: string): string {
-  // Sjekk om det er en bøye basert på navn
+  // Sjekk om det er en bøye basert på navn (inkludert feilstavinger)
   if (name) {
     const upperName = name.toUpperCase();
-    if (upperName.includes('BUOY') || upperName.includes('BØYE')) {
+    if (upperName.includes('BUOY') || upperName.includes('BOUY') || upperName.includes('BØYE')) {
       return 'Bøye';
+    }
+    // Sjekk om det er en plattform/rigg
+    if (
+      upperName.includes('PLATFORM') ||
+      upperName.includes('DEEPSEA') ||
+      upperName.includes('OCEAN RIG') ||
+      upperName.includes('NORNE')
+    ) {
+      return 'Plattform/Rigg';
+    }
+    // Sjekk om det er akvakultur/fiskeoppdrett
+    if (
+      upperName.includes('SOJ') ||
+      upperName.includes('SOY') ||
+      upperName.includes('FISHIES') ||
+      upperName.includes('FISH FARM') ||
+      upperName.includes('MERD') ||
+      upperName.includes('AKVA')
+    ) {
+      return 'Akvakultur';
     }
   }
 
@@ -122,11 +142,31 @@ export function formatTimestamp(timestamp: string): string {
  * Beregn farge basert på skipstype og navn
  */
 export function getShipColor(shipType?: number, name?: string): string {
-  // Sjekk om det er en bøye basert på navn
+  // Sjekk om det er en bøye basert på navn (inkludert feilstavinger)
   if (name) {
     const upperName = name.toUpperCase();
-    if (upperName.includes('BUOY') || upperName.includes('BØYE')) {
+    if (upperName.includes('BUOY') || upperName.includes('BOUY') || upperName.includes('BØYE')) {
       return '#FF6F00'; // Oransje for bøyer
+    }
+    // Sjekk om det er en plattform/rigg
+    if (
+      upperName.includes('PLATFORM') ||
+      upperName.includes('DEEPSEA') ||
+      upperName.includes('OCEAN RIG') ||
+      upperName.includes('NORNE')
+    ) {
+      return '#8B4513'; // Brun for plattformer
+    }
+    // Sjekk om det er akvakultur/fiskeoppdrett
+    if (
+      upperName.includes('SOJ') ||
+      upperName.includes('SOY') ||
+      upperName.includes('FISHIES') ||
+      upperName.includes('FISH FARM') ||
+      upperName.includes('MERD') ||
+      upperName.includes('AKVA')
+    ) {
+      return '#00CED1'; // Turkis for akvakultur
     }
   }
 

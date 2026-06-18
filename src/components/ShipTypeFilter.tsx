@@ -22,6 +22,18 @@ const SHIP_CATEGORIES: ShipTypeCategory[] = [
     color: '#FF6F00',
   },
   {
+    name: 'Plattformer / Rigger',
+    emoji: '🛢️',
+    types: [-2], // Spesiell verdi for navn-basert filtrering
+    color: '#8B4513',
+  },
+  {
+    name: 'Akvakultur / Fiskeoppdrett',
+    emoji: '🐟',
+    types: [-3], // Spesiell verdi for navn-basert filtrering
+    color: '#00CED1',
+  },
+  {
     name: 'Fiskebåter',
     emoji: '🎣',
     types: [ShipType.Fishing],
