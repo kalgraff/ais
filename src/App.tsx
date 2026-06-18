@@ -13,12 +13,12 @@ import type { MarineOverlayOptions } from './types/marine';
 import './App.css';
 
 function App() {
-  // Standard filter for norsk kyst (kan justeres)
+  // Standard filter for norsk kyst, inkludert Svalbard og Jan Mayen
   const [filter] = useState<AISFilter>({
     minLatitude: 57.0,
-    maxLatitude: 71.5,
-    minLongitude: 4.0,
-    maxLongitude: 32.0,
+    maxLatitude: 81.0,  // Utvidet nordover til Svalbard
+    minLongitude: -10.0, // Utvidet vestover til Jan Mayen
+    maxLongitude: 34.0,  // Utvidet østover til østre Svalbard
   });
 
   // Valgte skip-typer (starter med alle valgt)
