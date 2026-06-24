@@ -67,10 +67,45 @@ function MapController({
 /**
  * Opprett en tilpasset ikon for skip basert på type
  */
-function createShipIcon(ship: AISPosition): Icon {
+function createShipIcon(ship: AISPosition, isTracked: boolean = false): Icon {
   const color = getShipColor(ship.shipType, ship.name);
   
-  // Opprett SVG-ikon som en data URL
+  if (isTracked) {
+    // Større, mer fremtredende ikon for tracked skip
+    const svgIcon = `
+      <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+            <feMerge>
+              <feMergeNode in="coloredBlur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+        </defs>
+        <!-- Pulserende ring -->
+        <circle cx="24" cy="24" r="20" fill="none" stroke="#FF4081" stroke-width="3" opacity="0.4">
+          <animate attributeName="r" values="20;24;20" dur="2s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0.4;0.1;0.4" dur="2s" repeatCount="indefinite"/>
+        </circle>
+        <!-- Hovedsirkel -->
+        <circle cx="24" cy="24" r="16" fill="${color}" stroke="white" stroke-width="3" filter="url(#glow)"/>
+        <!-- Kryss -->
+        <path d="M 24 12 L 24 36 M 12 24 L 36 24" stroke="white" stroke-width="3"/>
+        <!-- Tracking-pil -->
+        <path d="M 24 8 L 28 16 L 20 16 Z" fill="#FF4081"/>
+      </svg>
+    `;
+
+    return new Icon({
+      iconUrl: `data:image/svg+xml;base64,${btoa(svgIcon)}`,
+      iconSize: [48, 48],
+      iconAnchor: [24, 24],
+      popupAnchor: [0, -24],
+    });
+  }
+  
+  // Vanlig ikon for andre skip
   const svgIcon = `
     <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
       <circle cx="12" cy="12" r="8" fill="${color}" stroke="white" stroke-width="2"/>
@@ -129,23 +164,27 @@ export function ShipMap({
       )}
 
       {/* Skip markers */}
-      {ships.map((ship) => (
-        <Marker
-          key={ship.mmsi}
-          position={[ship.latitude, ship.longitude]}
-          icon={createShipIcon(ship)}
-        >
-          <Popup>
-            <div
-              style={{
-                minWidth: '250px',
-                maxWidth: '400px',
-              }}
-              dangerouslySetInnerHTML={{ __html: generateShipInfo(ship) }}
-            />
-          </Popup>
-        </Marker>
-      ))}
+      {ships.map((ship) => {
+        const isTracked = trackedShip?.mmsi === ship.mmsi;
+        return (
+          <Marker
+            key={ship.mmsi}
+            position={[ship.latitude, ship.longitude]}
+            icon={createShipIcon(ship, isTracked)}
+            zIndexOffset={isTracked ? 1000 : 0}
+          >
+            <Popup>
+              <div
+                style={{
+                  minWidth: '250px',
+                  maxWidth: '400px',
+                }}
+                dangerouslySetInnerHTML={{ __html: generateShipInfo(ship) }}
+              />
+            </Popup>
+          </Marker>
+        );
+      })}
     </MapContainer>
   );
 }
