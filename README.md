@@ -44,10 +44,12 @@ Dette prosjektet viser maritim trafikk i sanntid ved å hente AIS-data (Automati
   - Søk på: Type (f.eks. "militært", "tankskip")
   - Søk på: Nasjonalitet (f.eks. "norge", "storbritannia")
 - ✅ **Skip tracking**:
+  - Start tracking fra søkeresultater ELLER direkte fra kart-popup
   - Automatisk sentrering på valgt skip
   - Stor, pulserende markør med tracking-pil
   - Kontinuerlig oppdatering av posisjon
   - Vises alltid, uavhengig av filter
+  - "Følg skip" / "Stopp følging" knapp i popup-boks
 - ✅ **Bevegelseshistorikk**:
   - Stiplet linje viser skipets bevegelse
   - Markører for start (grønn), nåværende (rosa), mellompunkter
@@ -142,11 +144,19 @@ npm run preview
 ```
 
 ### Tracking av skip
-1. Søk etter et skip
+
+**Metode 1: Fra søk**
+1. Søk etter et skip i søkefeltet (øverst til venstre)
 2. Klikk "📍 Følg" på søkeresultatet
 3. Kartet sentrerer seg på skipet
 4. Bevegelseshistorikk vises som en linje
 5. Klikk "⏸ Stopp følging" for å avslutte
+
+**Metode 2: Direkte fra kartet**
+1. Klikk på et skip-markør i kartet
+2. Klikk "📍 Følg skip" nederst i popup-boksen
+3. Skipet blir tracked med animert markør
+4. Klikk "⏸ Stopp følging" i popup for å avslutte
 
 ### Marine data
 1. Klikk på "🌊 Havdata" nederst til høyre

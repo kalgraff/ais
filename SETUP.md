@@ -158,12 +158,25 @@ const [filter] = useState<AISFilter>({
 ### Problem: Tracking fungerer ikke
 
 **Løsning:**
-1. Søk etter et skip
+
+Det er to måter å starte tracking:
+
+**Metode 1: Fra søk (øverst til venstre)**
+1. Søk etter et skip i søkefeltet
 2. Klikk "📍 Følg" i søkeresultatet
-3. Skipet må være innenfor dekningsområdet
-4. Skipet må sende aktive AIS-data
-5. Klikk "⏸ Stopp følging" for å avslutte tracking
-6. Bevegelseshistorikk lagres kun lokalt mens tracking er aktiv
+3. Skipet sentreres på kartet
+
+**Metode 2: Direkte fra kartet**
+1. Klikk på et skip-markør i kartet
+2. Popup-boks åpnes med skipsinformasjon
+3. Klikk "📍 Følg skip" nederst i popup
+4. Skipet blir tracked med animert markør
+
+**Viktig:**
+- Skipet må være innenfor dekningsområdet
+- Skipet må sende aktive AIS-data
+- Klikk "⏸ Stopp følging" for å avslutte tracking (i søk eller popup)
+- Bevegelseshistorikk lagres kun lokalt mens tracking er aktiv
 
 ## ⚙️ API-begrensninger
 
