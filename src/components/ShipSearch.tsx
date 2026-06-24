@@ -45,6 +45,16 @@ export function ShipSearch({ ships, trackedShip, onTrackShip, isTracking: extern
         if (ship.destination?.toLowerCase().includes(query)) {
           return true;
         }
+        // Søk på skip-type
+        const shipType = getShipTypeText(ship.shipType, ship.name).toLowerCase();
+        if (shipType.includes(query)) {
+          return true;
+        }
+        // Søk på nasjonalitet (både med og uten emoji)
+        const nationality = getCountryFromMMSI(ship.mmsi).toLowerCase();
+        if (nationality.includes(query)) {
+          return true;
+        }
         return false;
       })
       .slice(0, 20); // Begrens til 20 resultater
@@ -81,7 +91,7 @@ export function ShipSearch({ ships, trackedShip, onTrackShip, isTracking: extern
             <input
               type="text"
               className="search-input"
-              placeholder="Søk etter navn, MMSI, kallesignal..."
+              placeholder="Søk etter navn, MMSI, type, nasjonalitet..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               autoFocus
