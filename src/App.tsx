@@ -50,7 +50,7 @@ function App() {
   // Filtrer skip basert på valgte typer
   const ships = useMemo(() => {
     if (selectedTypes.size === 0) {
-      return allShips; // Vis alle hvis ingen er valgt
+      return []; // Vis ingen skip hvis ingen typer er valgt
     }
     return allShips.filter((ship) => {
       const upperName = ship.name?.toUpperCase() || '';
