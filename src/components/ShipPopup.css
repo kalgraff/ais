@@ -1,0 +1,50 @@
+.ship-popup {
+  min-width: 250px;
+  max-width: 400px;
+}
+
+.ship-popup-content {
+  margin-bottom: 12px;
+}
+
+.popup-row {
+  margin-bottom: 6px;
+  line-height: 1.4;
+}
+
+.popup-row strong {
+  color: #333;
+  margin-right: 4px;
+}
+
+.track-button {
+  width: 100%;
+  padding: 10px 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.track-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.track-button:active {
+  transform: translateY(0);
+}
+
+.track-button.tracking {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  box-shadow: 0 2px 8px rgba(245, 87, 108, 0.3);
+}
+
+.track-button.tracking:hover {
+  box-shadow: 0 4px 12px rgba(245, 87, 108, 0.4);
+}

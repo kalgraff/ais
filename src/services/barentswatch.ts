@@ -6,7 +6,6 @@ import type {
   AISPosition,
   AISFilter,
   BarentsWatchAuthResponse,
-  AISApiResponse,
 } from '../types/ais';
 
 // Bruk proxy i development, direkte URL i production

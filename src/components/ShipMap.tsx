@@ -7,9 +7,10 @@ import { Icon, LatLngBounds } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import type { AISPosition } from '../types/ais';
 import type { MarineDataPoint, MarineOverlayOptions } from '../types/marine';
-import { generateShipInfo, getShipColor } from '../utils/shipUtils';
+import { getShipColor } from '../utils/shipUtils';
 import { MarineDataLayer } from './MarineDataLayer';
 import { ShipTrackLine } from './ShipTrackLine';
+import { ShipPopup } from './ShipPopup';
 import { useEffect } from 'react';
 
 interface TrackPoint {
@@ -30,6 +31,8 @@ interface ShipMapProps {
   trackedShip?: AISPosition | null;
   isTracking?: boolean;
   trackHistory?: TrackPoint[];
+  onTrackShip?: (mmsi: number) => void;
+  onStopTracking?: () => void;
 }
 
 /**
@@ -144,6 +147,8 @@ export function ShipMap({
   trackedShip = null,
   isTracking = false,
   trackHistory = [],
+  onTrackShip = () => {},
+  onStopTracking = () => {},
 }: ShipMapProps) {
   return (
     <MapContainer
@@ -193,12 +198,11 @@ export function ShipMap({
             zIndexOffset={isTracked ? 1000 : 0}
           >
             <Popup>
-              <div
-                style={{
-                  minWidth: '250px',
-                  maxWidth: '400px',
-                }}
-                dangerouslySetInnerHTML={{ __html: generateShipInfo(ship) }}
+              <ShipPopup
+                ship={ship}
+                isTracked={isTracked}
+                onTrack={onTrackShip}
+                onStopTracking={onStopTracking}
               />
             </Popup>
           </Marker>

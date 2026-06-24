@@ -119,6 +119,19 @@ function App() {
     }
   };
 
+  const handleTrackShipByMMSI = (mmsi: number) => {
+    const ship = allShips.find((s) => s.mmsi === mmsi);
+    if (ship) {
+      handleTrackShip(ship);
+    }
+  };
+
+  const handleStopTracking = () => {
+    setTrackedShipMMSI(null);
+    setIsTracking(false);
+    setTrackHistory([]);
+  };
+
   // Hent marine data kun hvis minst ett overlay er aktivt
   const marineEnabled = marineOptions.showTemperature || marineOptions.showWaves || marineOptions.showCurrents;
   const { data: marineData, loading: marineLoading } = useMarineData(
@@ -299,6 +312,8 @@ function App() {
                 trackedShip={trackedShip}
                 isTracking={isTracking}
                 trackHistory={trackHistory}
+                onTrackShip={handleTrackShipByMMSI}
+                onStopTracking={handleStopTracking}
               />
               <ShipSearch
                 ships={allShips}
