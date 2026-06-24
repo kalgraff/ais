@@ -18,16 +18,39 @@ interface ShipMapProps {
   autoFit?: boolean;
   marineData?: MarineDataPoint[];
   marineOptions?: MarineOverlayOptions;
+  trackedShip?: AISPosition | null;
+  isTracking?: boolean;
 }
 
 /**
  * Komponent for å tilpasse kartvisning basert på skip
  */
-function MapController({ ships, autoFit }: { ships: AISPosition[]; autoFit: boolean }) {
+function MapController({
+  ships,
+  autoFit,
+  trackedShip,
+  isTracking,
+}: {
+  ships: AISPosition[];
+  autoFit: boolean;
+  trackedShip?: AISPosition | null;
+  isTracking?: boolean;
+}) {
   const map = useMap();
 
+  // Håndter tracking av skip
   useEffect(() => {
-    if (!autoFit || ships.length === 0) return;
+    if (trackedShip && isTracking) {
+      map.setView([trackedShip.latitude, trackedShip.longitude], 12, {
+        animate: true,
+        duration: 0.5,
+      });
+    }
+  }, [trackedShip, isTracking, map]);
+
+  // Håndter auto-fit for alle skip (kun når ikke tracking)
+  useEffect(() => {
+    if (!autoFit || ships.length === 0 || isTracking) return;
 
     // Beregn bounds for alle skip
     const bounds = new LatLngBounds(
@@ -36,7 +59,7 @@ function MapController({ ships, autoFit }: { ships: AISPosition[]; autoFit: bool
 
     // Tilpass kartet til å vise alle skip
     map.fitBounds(bounds, { padding: [50, 50] });
-  }, [ships, autoFit, map]);
+  }, [ships, autoFit, isTracking, map]);
 
   return null;
 }
@@ -73,6 +96,8 @@ export function ShipMap({
   autoFit = true,
   marineData = [],
   marineOptions = { showTemperature: false, showWaves: false, showCurrents: false },
+  trackedShip = null,
+  isTracking = false,
 }: ShipMapProps) {
   return (
     <MapContainer
@@ -86,7 +111,12 @@ export function ShipMap({
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
 
-      {autoFit && <MapController ships={ships} autoFit={autoFit} />}
+      <MapController 
+        ships={ships} 
+        autoFit={autoFit} 
+        trackedShip={trackedShip}
+        isTracking={isTracking}
+      />
 
       {/* Marine data overlay */}
       {marineData.length > 0 && (

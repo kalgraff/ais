@@ -2,14 +2,15 @@
  * Hovedapplikasjon for AIS-visning
  */
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { ShipMap } from './components/ShipMap';
 import { ShipTypeFilter } from './components/ShipTypeFilter';
 import { MarineOverlayControl } from './components/MarineOverlayControl';
 import { AutoRefreshControl } from './components/AutoRefreshControl';
+import { ShipSearch } from './components/ShipSearch';
 import { useAISData } from './hooks/useAISData';
 import { useMarineData } from './hooks/useMarineData';
-import type { AISFilter } from './types/ais';
+import type { AISFilter, AISPosition } from './types/ais';
 import type { MarineOverlayOptions } from './types/marine';
 import './App.css';
 
@@ -36,11 +37,39 @@ function App() {
   const [autoRefreshEnabled, setAutoRefreshEnabled] = useState<boolean>(true);
   const [autoRefreshInterval, setAutoRefreshInterval] = useState<number>(60000); // 1 minutt som standard
 
+  // Ship tracking
+  const [trackedShipMMSI, setTrackedShipMMSI] = useState<number | null>(null);
+  const [isTracking, setIsTracking] = useState<boolean>(false);
+
   const { ships: allShips, loading, error, refetch } = useAISData(
     filter,
     autoRefreshInterval,
     autoRefreshEnabled
   );
+
+  // Finn det trackede skipet i oppdatert data
+  const trackedShip = useMemo(() => {
+    if (!trackedShipMMSI) return null;
+    return allShips.find((ship) => ship.mmsi === trackedShipMMSI) || null;
+  }, [allShips, trackedShipMMSI]);
+
+  // Oppdater tracking state hvis skipet forsvinner
+  useEffect(() => {
+    if (trackedShipMMSI && !trackedShip) {
+      setTrackedShipMMSI(null);
+      setIsTracking(false);
+    }
+  }, [trackedShipMMSI, trackedShip]);
+
+  const handleTrackShip = (ship: AISPosition | null) => {
+    if (ship) {
+      setTrackedShipMMSI(ship.mmsi);
+      setIsTracking(true);
+    } else {
+      setTrackedShipMMSI(null);
+      setIsTracking(false);
+    }
+  };
 
   // Hent marine data kun hvis minst ett overlay er aktivt
   const marineEnabled = marineOptions.showTemperature || marineOptions.showWaves || marineOptions.showCurrents;
@@ -206,9 +235,17 @@ function App() {
             <>
               <ShipMap 
                 ships={ships} 
-                autoFit={ships.length > 0}
+                autoFit={ships.length > 0 && !isTracking}
                 marineData={marineData}
                 marineOptions={marineOptions}
+                trackedShip={trackedShip}
+                isTracking={isTracking}
+              />
+              <ShipSearch
+                ships={allShips}
+                trackedShip={trackedShip}
+                onTrackShip={handleTrackShip}
+                isTracking={isTracking}
               />
               <AutoRefreshControl
                 enabled={autoRefreshEnabled}
