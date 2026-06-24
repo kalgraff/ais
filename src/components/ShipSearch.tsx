@@ -4,7 +4,7 @@
 
 import { useState, useMemo } from 'react';
 import type { AISPosition } from '../types/ais';
-import { getShipTypeText, getCountryFromMMSI } from '../utils/shipUtils';
+import { getShipTypeText, getCountryFromMMSI, formatSpeed } from '../utils/shipUtils';
 import './ShipSearch.css';
 
 interface ShipSearchProps {
@@ -128,6 +128,9 @@ export function ShipSearch({ ships, trackedShip, onTrackShip, isTracking: extern
                 </div>
                 <div className="tracked-type">
                   {getShipTypeText(trackedShip.shipType, trackedShip.name)}
+                  {trackedShip.speedOverGround !== undefined && trackedShip.speedOverGround !== null && (
+                    <span style={{ color: '#1565c0', fontWeight: 600 }}> • {formatSpeed(trackedShip.speedOverGround)}</span>
+                  )}
                 </div>
               </div>
               <button
@@ -159,6 +162,9 @@ export function ShipSearch({ ships, trackedShip, onTrackShip, isTracking: extern
                           </div>
                           <div className="result-type">
                             {getShipTypeText(ship.shipType, ship.name)}
+                            {ship.speedOverGround !== undefined && ship.speedOverGround !== null && (
+                              <span className="result-speed"> • {formatSpeed(ship.speedOverGround)}</span>
+                            )}
                           </div>
                         </div>
                         <button

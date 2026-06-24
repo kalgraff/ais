@@ -262,6 +262,11 @@
   color: #888;
 }
 
+.result-speed {
+  color: #2196f3;
+  font-weight: 600;
+}
+
 .track-button {
   padding: 0.5rem 1rem;
   background: #2196f3;
