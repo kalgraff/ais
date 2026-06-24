@@ -40,6 +40,13 @@ function App() {
   // Ship tracking
   const [trackedShipMMSI, setTrackedShipMMSI] = useState<number | null>(null);
   const [isTracking, setIsTracking] = useState<boolean>(false);
+  const [trackHistory, setTrackHistory] = useState<Array<{
+    latitude: number;
+    longitude: number;
+    timestamp: string;
+    speed?: number;
+    course?: number;
+  }>>([]);
 
   const { ships: allShips, loading, error, refetch } = useAISData(
     filter,
@@ -58,16 +65,57 @@ function App() {
     if (trackedShipMMSI && !trackedShip) {
       setTrackedShipMMSI(null);
       setIsTracking(false);
+      setTrackHistory([]);
     }
   }, [trackedShipMMSI, trackedShip]);
+
+  // Legg til ny posisjon i track history når tracked skip oppdateres
+  useEffect(() => {
+    if (trackedShip && isTracking) {
+      setTrackHistory((prev) => {
+        // Sjekk om denne posisjonen allerede er lagt til (unngå duplikater)
+        const lastEntry = prev[prev.length - 1];
+        if (
+          lastEntry &&
+          lastEntry.latitude === trackedShip.latitude &&
+          lastEntry.longitude === trackedShip.longitude
+        ) {
+          return prev; // Samme posisjon, ikke legg til
+        }
+
+        // Legg til ny posisjon
+        return [
+          ...prev,
+          {
+            latitude: trackedShip.latitude,
+            longitude: trackedShip.longitude,
+            timestamp: trackedShip.msgtime,
+            speed: trackedShip.speedOverGround,
+            course: trackedShip.courseOverGround,
+          },
+        ];
+      });
+    }
+  }, [trackedShip, isTracking]);
 
   const handleTrackShip = (ship: AISPosition | null) => {
     if (ship) {
       setTrackedShipMMSI(ship.mmsi);
       setIsTracking(true);
+      // Start track history med første posisjon
+      setTrackHistory([
+        {
+          latitude: ship.latitude,
+          longitude: ship.longitude,
+          timestamp: ship.msgtime,
+          speed: ship.speedOverGround,
+          course: ship.courseOverGround,
+        },
+      ]);
     } else {
       setTrackedShipMMSI(null);
       setIsTracking(false);
+      setTrackHistory([]);
     }
   };
 
@@ -250,6 +298,7 @@ function App() {
                 marineOptions={marineOptions}
                 trackedShip={trackedShip}
                 isTracking={isTracking}
+                trackHistory={trackHistory}
               />
               <ShipSearch
                 ships={allShips}

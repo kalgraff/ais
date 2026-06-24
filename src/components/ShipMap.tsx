@@ -9,7 +9,16 @@ import type { AISPosition } from '../types/ais';
 import type { MarineDataPoint, MarineOverlayOptions } from '../types/marine';
 import { generateShipInfo, getShipColor } from '../utils/shipUtils';
 import { MarineDataLayer } from './MarineDataLayer';
+import { ShipTrackLine } from './ShipTrackLine';
 import { useEffect } from 'react';
+
+interface TrackPoint {
+  latitude: number;
+  longitude: number;
+  timestamp: string;
+  speed?: number;
+  course?: number;
+}
 
 interface ShipMapProps {
   ships: AISPosition[];
@@ -20,6 +29,7 @@ interface ShipMapProps {
   marineOptions?: MarineOverlayOptions;
   trackedShip?: AISPosition | null;
   isTracking?: boolean;
+  trackHistory?: TrackPoint[];
 }
 
 /**
@@ -133,6 +143,7 @@ export function ShipMap({
   marineOptions = { showTemperature: false, showWaves: false, showCurrents: false },
   trackedShip = null,
   isTracking = false,
+  trackHistory = [],
 }: ShipMapProps) {
   return (
     <MapContainer
@@ -160,6 +171,14 @@ export function ShipMap({
           showTemperature={marineOptions.showTemperature}
           showWaves={marineOptions.showWaves}
           showCurrents={marineOptions.showCurrents}
+        />
+      )}
+
+      {/* Track history line for tracked ship */}
+      {trackHistory.length > 0 && isTracking && (
+        <ShipTrackLine 
+          trackHistory={trackHistory}
+          color={trackedShip ? getShipColor(trackedShip.shipType, trackedShip.name) : '#FF4081'}
         />
       )}
 
