@@ -30,7 +30,21 @@ export function ShipPopup({ ship, isTracked = false, onTrack, onStopTracking }: 
   };
 
   return (
-    <div className="ship-popup">
+    <div className={`ship-popup ${isTracked ? 'tracking' : ''}`}>
+      {isTracked && (
+        <div style={{ 
+          background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+          color: 'white',
+          padding: '6px 12px',
+          borderRadius: '4px 4px 0 0',
+          marginBottom: '8px',
+          fontWeight: 600,
+          textAlign: 'center',
+          fontSize: '13px'
+        }}>
+          📍 FØLGER DETTE SKIPET
+        </div>
+      )}
       <div className="ship-popup-content">
         {ship.name && (
           <div className="popup-row">

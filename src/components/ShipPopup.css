@@ -3,6 +3,13 @@
   max-width: 400px;
 }
 
+.ship-popup.tracking {
+  border: 2px solid #FF4081;
+  border-radius: 4px;
+  padding: 2px;
+  box-shadow: 0 0 10px rgba(255, 64, 129, 0.3);
+}
+
 .ship-popup-content {
   margin-bottom: 12px;
 }

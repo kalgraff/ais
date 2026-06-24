@@ -11,7 +11,7 @@ import { getShipColor } from '../utils/shipUtils';
 import { MarineDataLayer } from './MarineDataLayer';
 import { ShipTrackLine } from './ShipTrackLine';
 import { ShipPopup } from './ShipPopup';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 interface TrackPoint {
   latitude: number;
@@ -75,6 +75,49 @@ function MapController({
   }, [ships, autoFit, isTracking, map]);
 
   return null;
+}
+
+/**
+ * Marker-komponent med popup som lukker automatisk ved tracking
+ */
+function MarkerWithPopup({
+  ship,
+  isTracked,
+  onTrack,
+  onStopTracking,
+}: {
+  ship: AISPosition;
+  isTracked: boolean;
+  onTrack: (mmsi: number) => void;
+  onStopTracking: () => void;
+}) {
+  const markerRef = useRef<any>(null);
+
+  const handleTrack = (mmsi: number) => {
+    // Lukk popup når tracking starter
+    if (markerRef.current) {
+      markerRef.current.closePopup();
+    }
+    onTrack(mmsi);
+  };
+
+  return (
+    <Marker
+      ref={markerRef}
+      position={[ship.latitude, ship.longitude]}
+      icon={createShipIcon(ship, isTracked)}
+      zIndexOffset={isTracked ? 1000 : 0}
+    >
+      <Popup>
+        <ShipPopup
+          ship={ship}
+          isTracked={isTracked}
+          onTrack={handleTrack}
+          onStopTracking={onStopTracking}
+        />
+      </Popup>
+    </Marker>
+  );
 }
 
 /**
@@ -191,21 +234,13 @@ export function ShipMap({
       {ships.map((ship) => {
         const isTracked = trackedShip?.mmsi === ship.mmsi;
         return (
-          <Marker
+          <MarkerWithPopup
             key={ship.mmsi}
-            position={[ship.latitude, ship.longitude]}
-            icon={createShipIcon(ship, isTracked)}
-            zIndexOffset={isTracked ? 1000 : 0}
-          >
-            <Popup>
-              <ShipPopup
-                ship={ship}
-                isTracked={isTracked}
-                onTrack={onTrackShip}
-                onStopTracking={onStopTracking}
-              />
-            </Popup>
-          </Marker>
+            ship={ship}
+            isTracked={isTracked}
+            onTrack={onTrackShip}
+            onStopTracking={onStopTracking}
+          />
         );
       })}
     </MapContainer>

@@ -8,6 +8,7 @@ import { ShipTypeFilter } from './components/ShipTypeFilter';
 import { MarineOverlayControl } from './components/MarineOverlayControl';
 import { AutoRefreshControl } from './components/AutoRefreshControl';
 import { ShipSearch } from './components/ShipSearch';
+import { TrackingIndicator } from './components/TrackingIndicator';
 import { useAISData } from './hooks/useAISData';
 import { useMarineData } from './hooks/useMarineData';
 import type { AISFilter, AISPosition } from './types/ais';
@@ -124,7 +125,10 @@ function App() {
   const handleTrackShipByMMSI = (mmsi: number) => {
     const ship = allShips.find((s) => s.mmsi === mmsi);
     if (ship) {
+      console.log('🚢 Starter tracking av skip:', ship.name, 'MMSI:', ship.mmsi);
       handleTrackShip(ship);
+    } else {
+      console.warn('⚠️ Skip ikke funnet for MMSI:', mmsi);
     }
   };
 
@@ -316,6 +320,12 @@ function App() {
                 onTrackShip={handleTrackShipByMMSI}
                 onStopTracking={handleStopTracking}
               />
+              {isTracking && trackedShip && (
+                <TrackingIndicator 
+                  ship={trackedShip}
+                  onStopTracking={handleStopTracking}
+                />
+              )}
               <ShipSearch
                 ships={allShips}
                 trackedShip={trackedShip}
