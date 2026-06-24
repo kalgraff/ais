@@ -87,44 +87,54 @@ function App() {
 
   // Filtrer skip basert på valgte typer
   const ships = useMemo(() => {
+    let filteredShips: AISPosition[] = [];
+    
     if (selectedTypes.size === 0) {
-      return []; // Vis ingen skip hvis ingen typer er valgt
+      filteredShips = []; // Vis ingen skip hvis ingen typer er valgt
+    } else {
+      filteredShips = allShips.filter((ship) => {
+        const upperName = ship.name?.toUpperCase() || '';
+        
+        // Sjekk for bøyer (type -1 betyr navn-basert filtrering, inkludert feilstavinger)
+        if (selectedTypes.has(-1)) {
+          const isBuoy = upperName.includes('BUOY') || 
+                         upperName.includes('BOUY') || 
+                         upperName.includes('BØYE');
+          if (isBuoy) return true;
+        }
+        
+        // Sjekk for plattformer/rigger (type -2)
+        if (selectedTypes.has(-2)) {
+          const isPlatform = upperName.includes('PLATFORM') ||
+                            upperName.includes('DEEPSEA') ||
+                            upperName.includes('OCEAN RIG') ||
+                            upperName.includes('NORNE');
+          if (isPlatform) return true;
+        }
+        
+        // Sjekk for akvakultur (type -3)
+        if (selectedTypes.has(-3)) {
+          const isAquaculture = upperName.includes('SOJ') ||
+                               upperName.includes('SOY') ||
+                               upperName.includes('FISHIES') ||
+                               upperName.includes('FISH FARM') ||
+                               upperName.includes('MERD') ||
+                               upperName.includes('AKVA');
+          if (isAquaculture) return true;
+        }
+        
+        // Vanlig shipType filtrering
+        return ship.shipType !== undefined && selectedTypes.has(ship.shipType);
+      });
     }
-    return allShips.filter((ship) => {
-      const upperName = ship.name?.toUpperCase() || '';
-      
-      // Sjekk for bøyer (type -1 betyr navn-basert filtrering, inkludert feilstavinger)
-      if (selectedTypes.has(-1)) {
-        const isBuoy = upperName.includes('BUOY') || 
-                       upperName.includes('BOUY') || 
-                       upperName.includes('BØYE');
-        if (isBuoy) return true;
-      }
-      
-      // Sjekk for plattformer/rigger (type -2)
-      if (selectedTypes.has(-2)) {
-        const isPlatform = upperName.includes('PLATFORM') ||
-                          upperName.includes('DEEPSEA') ||
-                          upperName.includes('OCEAN RIG') ||
-                          upperName.includes('NORNE');
-        if (isPlatform) return true;
-      }
-      
-      // Sjekk for akvakultur (type -3)
-      if (selectedTypes.has(-3)) {
-        const isAquaculture = upperName.includes('SOJ') ||
-                             upperName.includes('SOY') ||
-                             upperName.includes('FISHIES') ||
-                             upperName.includes('FISH FARM') ||
-                             upperName.includes('MERD') ||
-                             upperName.includes('AKVA');
-        if (isAquaculture) return true;
-      }
-      
-      // Vanlig shipType filtrering
-      return ship.shipType !== undefined && selectedTypes.has(ship.shipType);
-    });
-  }, [allShips, selectedTypes]);
+    
+    // Alltid inkluder tracked skip, selv om det ikke matcher filteret
+    if (trackedShip && !filteredShips.find((s) => s.mmsi === trackedShip.mmsi)) {
+      filteredShips = [...filteredShips, trackedShip];
+    }
+    
+    return filteredShips;
+  }, [allShips, selectedTypes, trackedShip]);
 
   // Tell antall skip per type
   const shipCounts = useMemo(() => {
