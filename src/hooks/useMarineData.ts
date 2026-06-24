@@ -30,6 +30,7 @@ export function useMarineData(
 
   useEffect(() => {
     if (!enabled || !bounds) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setData([]);
       return;
     }
@@ -89,7 +90,10 @@ export function useMarineData(
     return () => {
       isCancelled = true;
     };
-  }, [bounds?.minLat, bounds?.maxLat, bounds?.minLon, bounds?.maxLon, enabled]);
+    // Vi bruker individuelle properties istedenfor hele bounds objektet
+    // for å unngå unødvendige re-renders når objektet får ny referanse
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [enabled, bounds?.minLat, bounds?.maxLat, bounds?.minLon, bounds?.maxLon]);
 
   return {
     data,

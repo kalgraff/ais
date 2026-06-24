@@ -63,6 +63,7 @@ function App() {
   // Oppdater tracking state hvis skipet forsvinner
   useEffect(() => {
     if (trackedShipMMSI && !trackedShip) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setTrackedShipMMSI(null);
       setIsTracking(false);
       setTrackHistory([]);
@@ -72,6 +73,7 @@ function App() {
   // Legg til ny posisjon i track history når tracked skip oppdateres
   useEffect(() => {
     if (trackedShip && isTracking) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setTrackHistory((prev) => {
         // Sjekk om denne posisjonen allerede er lagt til (unngå duplikater)
         const lastEntry = prev[prev.length - 1];
@@ -148,12 +150,12 @@ function App() {
 
   // Filtrer skip basert på valgte typer
   const ships = useMemo(() => {
-    let filteredShips: AISPosition[] = [];
-    
     if (selectedTypes.size === 0) {
-      filteredShips = []; // Vis ingen skip hvis ingen typer er valgt
-    } else {
-      filteredShips = allShips.filter((ship) => {
+      // Alltid inkluder tracked skip, selv om ingen filter er valgt
+      return trackedShip ? [trackedShip] : [];
+    }
+    
+    const filteredShips = allShips.filter((ship) => {
         const upperName = ship.name?.toUpperCase() || '';
         
         // Sjekk for bøyer (type -1 betyr navn-basert filtrering, inkludert feilstavinger)
@@ -187,11 +189,10 @@ function App() {
         // Vanlig shipType filtrering
         return ship.shipType !== undefined && selectedTypes.has(ship.shipType);
       });
-    }
     
     // Alltid inkluder tracked skip, selv om det ikke matcher filteret
     if (trackedShip && !filteredShips.find((s) => s.mmsi === trackedShip.mmsi)) {
-      filteredShips = [...filteredShips, trackedShip];
+      return [...filteredShips, trackedShip];
     }
     
     return filteredShips;
