@@ -19,6 +19,32 @@ interface ShipTrackLineProps {
 }
 
 export function ShipTrackLine({ trackHistory, color = '#FF4081' }: ShipTrackLineProps) {
+  // Vis enkelt punkt hvis bare 1 posisjon
+  if (trackHistory.length === 1) {
+    const point = trackHistory[0];
+    return (
+      <CircleMarker
+        center={[point.latitude, point.longitude]}
+        radius={8}
+        pathOptions={{
+          fillColor: '#4CAF50',
+          fillOpacity: 1,
+          color: '#2E7D32',
+          weight: 3,
+        }}
+      >
+        <Tooltip direction="top" offset={[0, -10]} opacity={0.9} permanent>
+          <div style={{ fontSize: '0.85rem', textAlign: 'center' }}>
+            <div><strong>🟢 Start tracking</strong></div>
+            <div style={{ fontSize: '0.75rem', marginTop: '4px' }}>
+              Venter på neste posisjon...
+            </div>
+          </div>
+        </Tooltip>
+      </CircleMarker>
+    );
+  }
+  
   if (trackHistory.length < 2) {
     return null; // Trenger minst 2 punkter for å tegne en linje
   }

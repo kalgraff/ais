@@ -83,11 +83,12 @@ function App() {
           lastEntry.latitude === trackedShip.latitude &&
           lastEntry.longitude === trackedShip.longitude
         ) {
+          console.log('📍 Samme posisjon, venter på bevegelse...');
           return prev; // Samme posisjon, ikke legg til
         }
 
         // Legg til ny posisjon
-        return [
+        const newHistory = [
           ...prev,
           {
             latitude: trackedShip.latitude,
@@ -97,6 +98,8 @@ function App() {
             course: trackedShip.courseOverGround,
           },
         ];
+        console.log(`📊 Track history oppdatert: ${newHistory.length} posisjoner`, newHistory);
+        return newHistory;
       });
     }
   }, [trackedShip, isTracking]);
@@ -324,6 +327,7 @@ function App() {
                 <TrackingIndicator 
                   ship={trackedShip}
                   onStopTracking={handleStopTracking}
+                  trackHistoryLength={trackHistory.length}
                 />
               )}
               <ShipSearch
