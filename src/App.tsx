@@ -6,6 +6,7 @@ import { useState, useMemo } from 'react';
 import { ShipMap } from './components/ShipMap';
 import { ShipTypeFilter } from './components/ShipTypeFilter';
 import { MarineOverlayControl } from './components/MarineOverlayControl';
+import { AutoRefreshControl } from './components/AutoRefreshControl';
 import { useAISData } from './hooks/useAISData';
 import { useMarineData } from './hooks/useMarineData';
 import type { AISFilter } from './types/ais';
@@ -31,7 +32,15 @@ function App() {
     showCurrents: false,
   });
 
-  const { ships: allShips, loading, error, refetch } = useAISData(filter, 60000);
+  // Auto-refresh options
+  const [autoRefreshEnabled, setAutoRefreshEnabled] = useState<boolean>(true);
+  const [autoRefreshInterval, setAutoRefreshInterval] = useState<number>(60000); // 1 minutt som standard
+
+  const { ships: allShips, loading, error, refetch } = useAISData(
+    filter,
+    autoRefreshInterval,
+    autoRefreshEnabled
+  );
 
   // Hent marine data kun hvis minst ett overlay er aktivt
   const marineEnabled = marineOptions.showTemperature || marineOptions.showWaves || marineOptions.showCurrents;
@@ -201,6 +210,12 @@ function App() {
                 marineData={marineData}
                 marineOptions={marineOptions}
               />
+              <AutoRefreshControl
+                enabled={autoRefreshEnabled}
+                interval={autoRefreshInterval}
+                onToggle={() => setAutoRefreshEnabled(!autoRefreshEnabled)}
+                onIntervalChange={setAutoRefreshInterval}
+              />
               <MarineOverlayControl
                 options={marineOptions}
                 onOptionsChange={setMarineOptions}
@@ -226,8 +241,19 @@ function App() {
           >
             BarentsWatch
           </a>
-          {' • '}
-          Oppdateres automatisk hvert 60. sekund
+          {autoRefreshEnabled && (
+            <>
+              {' • '}
+              Oppdateres automatisk hvert{' '}
+              {autoRefreshInterval === 30000
+                ? '30. sekund'
+                : autoRefreshInterval === 60000
+                  ? '60. sekund'
+                  : autoRefreshInterval === 180000
+                    ? '3. minutt'
+                    : '5. minutt'}
+            </>
+          )}
         </p>
       </footer>
     </div>
